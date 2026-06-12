@@ -1,6 +1,6 @@
 ---
 title: Packagification how we turned a Wagtail website into a Wagtail package
-author: Fabien Le Frapper
+author: https://github.com/fabienheureux/packagification
 theme:
   name: catppuccin-latte
 ---
@@ -372,138 +372,11 @@ Same tag as upstream — versioning stays iso.
 
 
 
-
-
-
-
-
-<!-- font_size: 2 -->
-# How 
-
-## Installation
-
-https://docs.wagtail.org/en/stable/advanced_topics/add_to_django_project.html
-
-<!-- pause -->
-
-<!-- font_size: 1 -->
-<!-- column_layout: [1] -->
-<!-- column: 0 -->
-
-```shell
-uv add sites-conformes    
-```
-```python
-
-import sites_conformes
-
-INSTALLED_APPS.extend([
-    "dsfr",
-    # Le package lui-même (fournit les templates de base partagés)
-    "sites_conformes",
-    # Les apps qu'il contient
-    "sites_conformes.core",
-    "sites_conformes.blog",
-    "sites_conformes.events",
-    "sites_conformes.forms",
-    "sites_conformes.menus",
-    "sites_conformes.dashboard",
-])
-
-TEMPLATES[0]["OPTIONS"]["context_processors"].extend([
-    "wagtailmenus.context_processors.wagtailmenus",
-    "sites_conformes.core.context_processors.skiplinks",
-    "sites_conformes.core.context_processors.mega_menus",
-])
-
-
-PACKAGE_DIR = Path(sites_conformes.__file__).resolve().parent
-
-TEMPLATES[0]["DIRS"].append(PACKAGE_DIR / "templates")
-STATICFILES_DIRS = (PACKAGE_DIR / "static",) + tuple(STATICFILES_DIRS)
-```
-<!-- pause -->
-
-<!-- font_size: 2 -->
-## The merge & deployment
-
-rename tables 
-<!-- pause -->
-update migrations table
-<!-- pause -->
-update content_types table
-<!-- pause -->
-
-
-```shell
-python manage.py migrate_from_sites_faciles
-```
-
-<!-- 
-speaker_note: |
-In a fresh project, installation is one line. Done.
-The hard part was our own case: production already had
-Sites Conformes tables created when the code lived inside the repo.
-Renaming the app label means django no longer recognizes anything:
-tables must be renamed, the django_migrations table rewritten,
-and content_types updated so pages keep pointing at the right models.
-All of it wrapped in a single management command — one deploy, no data loss.
--->
-
-
-
-
-
-
-
-
-
-
-<!-- end_slide -->
-
-
-<!-- 
-speaker_note: |
-It works — in production, on real sites.
-The editable install is the underrated win: you hack on the package
-from a consuming project and see changes live, great dev loop.
-Repeatable: new upstream tag, run the script, new package version on PyPI.
-And documentation: every rule in the YAML has a comment saying WHY it exists.
-Six months later, that's the only reason I can still maintain it.
--->
-<!-- font_size: 2 -->
-# Lessons learned
-
-<!-- pause -->
-
-it works
-<!-- pause -->
-
-starting with standalone wagtail does not prevent you from making it reusable later 
-<!-- pause -->
-
-`uv add --editable ../sites_conformes` from another project
-<!-- pause -->
-
-repeatable
-<!-- pause -->
-
-write documentation early
-
-
-<!-- pause -->
-`--dry-run` and logs
-
-
-<!-- end_slide -->
-
-
-
-
 <!-- font_size: 2 -->
 # demo 
 <!-- font_size: 1 -->
 
+<!-- pause -->
 <!-- column_layout: [1, 1] -->
 <!-- column: 0 -->
 ```python
@@ -563,11 +436,99 @@ class ProduitPage(Page)
 <!-- reset_layout -->
 <!-- pause -->
 
-<!-- font_size: 3 -->
-https://quefairedemesdechets.ademe.fr/cms
 
 <!-- end_slide -->
 
+
+
+
+
+
+
+<!-- font_size: 2 -->
+# Adoption 
+
+## Installation
+
+https://docs.wagtail.org/en/stable/advanced_topics/add_to_django_project.html
+
+<!-- pause -->
+
+<!-- font_size: 1 -->
+<!-- column_layout: [1] -->
+<!-- column: 0 -->
+
+```shell
+uv add sites-conformes    
+```
+```python
+
+import sites_conformes
+
+INSTALLED_APPS.extend([
+    "dsfr",
+    # Le package lui-même (fournit les templates de base partagés)
+    "sites_conformes",
+    # Les apps qu'il contient
+    "sites_conformes.core",
+    "sites_conformes.blog",
+    "sites_conformes.events",
+    "sites_conformes.forms",
+    "sites_conformes.menus",
+    "sites_conformes.dashboard",
+])
+
+TEMPLATES[0]["OPTIONS"]["context_processors"].extend([
+    "wagtailmenus.context_processors.wagtailmenus",
+    "sites_conformes.core.context_processors.skiplinks",
+    "sites_conformes.core.context_processors.mega_menus",
+])
+
+
+PACKAGE_DIR = Path(sites_conformes.__file__).resolve().parent
+
+TEMPLATES[0]["DIRS"].append(PACKAGE_DIR / "templates")
+STATICFILES_DIRS = (PACKAGE_DIR / "static",) + tuple(STATICFILES_DIRS)
+```
+<!-- pause -->
+
+<!-- font_size: 2 -->
+## The merge & deployment
+
+<!-- pause -->
+rename tables 
+<!-- pause -->
+update migrations table
+<!-- pause -->
+update content_types table
+<!-- pause -->
+
+
+```shell
+python manage.py migrate_from_sites_faciles
+```
+
+<!-- 
+speaker_note: |
+In a fresh project, installation is one line. Done.
+The hard part was our own case: production already had
+Sites Conformes tables created when the code lived inside the repo.
+Renaming the app label means django no longer recognizes anything:
+tables must be renamed, the django_migrations table rewritten,
+and content_types updated so pages keep pointing at the right models.
+All of it wrapped in a single management command — one deploy, no data loss.
+-->
+
+
+
+
+
+
+
+
+
+
+<!-- end_slide -->
 
 
 
@@ -618,6 +579,40 @@ https://plusfraisautravail.beta.gouv.fr/
 
 
 
+<!-- 
+speaker_note: |
+It works — in production, on real sites.
+The editable install is the underrated win: you hack on the package
+from a consuming project and see changes live, great dev loop.
+Repeatable: new upstream tag, run the script, new package version on PyPI.
+And documentation: every rule in the YAML has a comment saying WHY it exists.
+Six months later, that's the only reason I can still maintain it.
+-->
+<!-- font_size: 2 -->
+# Lessons learned
+
+<!-- pause -->
+
+it works
+<!-- pause -->
+
+starting with standalone wagtail does not prevent you from making it reusable later 
+<!-- pause -->
+
+`uv add --editable ../sites_conformes` from another project
+<!-- pause -->
+
+repeatable
+<!-- pause -->
+
+write documentation early
+
+
+<!-- pause -->
+`--dry-run` and logs
+
+
+<!-- end_slide -->
 
 
 
@@ -652,6 +647,7 @@ swappable models - https://github.com/wagtail/roadmap/issues/126
 an extensible streamfield
 <!-- pause -->
 stop StreamField from generating migrations :
+- https://github.com/numerique-gouv/sites-conformes/pull/530/changes
 - https://dev.to/joeyjurjens/dynamic-blocks-for-wagtail-streamfields-bf1
 - https://gist.github.com/zerolab/cbd19becd21a5ab12a711674d5979157
 - https://cynthiakiser.com/blog/2022/01/06/trimming-wagtail-migration-cruft.html
